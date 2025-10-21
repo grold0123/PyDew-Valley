@@ -8,8 +8,6 @@ class Game:
         self.clock = pygame.time.Clock()
         self.state = STARTGAME
     
-        
-
         self.test_group = GroupObject()
 
         self.test = Object(self.test_group)
