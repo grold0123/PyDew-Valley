@@ -1,7 +1,9 @@
+#python src/main.py
 from utility import *
 from game import Game
 
 if __name__ == "__main__":
+    
     os.system('cls')
     game = Game()
 

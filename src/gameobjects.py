@@ -29,6 +29,8 @@ class GroupObject:
     def add_member(self,obj):
         self.members.append(obj)
 
+    
+
 class Object:
     def __init__(self,group:GroupObject):
         

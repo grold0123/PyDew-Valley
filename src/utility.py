@@ -16,6 +16,8 @@ FRICTION = 0.4
 # -- game states --
 STARTGAME = 'start game'
 CLOSEGAME = 'close game'
+EDITORMODE = 'editor mode'
+INGAME = 'in game'
 
 # -- character constants --
 IDLE = 'idle'
