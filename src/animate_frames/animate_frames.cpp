@@ -1,5 +1,5 @@
 /**********************************
-add_input
+animate_frames
 **********************************/
 #include"SDL3/SDL.h"
 #include"SDL3_image/SDL_image.h"
@@ -9,7 +9,7 @@ add_input
 using namespace std;
 
 enum 
-playerDirection {UP,DOWN,RIGHT,LEFT};
+playerDirection {UP,DOWN,RIGHT,LEFT,IDLE};
 
 const char
 *title;
@@ -25,8 +25,7 @@ struct vector2D{
 
 int 
 width,
-height,
-playerFrameIndex;
+height;
 
 float 
 offset_w,
@@ -34,7 +33,9 @@ offset_h,
 playerSpeed,
 nowTick,
 deltaTime,
-friction;
+friction,
+animationSpeed,
+playerFrameIndex;
 
 bool
 running;
@@ -58,7 +59,8 @@ vector<SDL_Texture*>
 playerDown,
 playerUp,
 playerLeft,
-playerRight;
+playerRight,
+currentFrames;
 
 SDL_FRect 
 playerRect,
@@ -97,13 +99,14 @@ int main(){
         playerUp.push_back(texture);
     }
     
-    playerFrameIndex = 0;
+    playerFrameIndex = 0.0f;
 
     player = playerDown[playerFrameIndex];    
     playerRect.x = playerRect.y = 0;
     SDL_GetTextureSize(player,&playerRect.w,&playerRect.h);
 
-    playerDirection playerDirection;    
+    playerDirection currentDirection = DOWN;    
+    playerDirection lastDirection = currentDirection;
 
     vector2D position{playerRect.x,playerRect.y};
     vector2D acceleration;
@@ -111,6 +114,7 @@ int main(){
     vector2D direction;
     friction = .3;
     playerSpeed = 1000;
+    animationSpeed = 20;
     
     while (running) {
         
@@ -120,18 +124,30 @@ int main(){
         }
         
         nowTick = SDL_GetTicks();
-        deltaTime = (nowTick - lastTick)/1000.0f;
+        deltaTime = static_cast<float>(nowTick - lastTick)/1000.0f;
         lastTick = nowTick;
 
         direction = {0,0};
 
         keystate = SDL_GetKeyboardState(nullptr);
 
-        if (keystate[SDL_SCANCODE_W]) direction.y = -1;
-        else if (keystate[SDL_SCANCODE_S]) direction.y = 1;
+        if (keystate[SDL_SCANCODE_W]) {
+            direction.y = -1;
+            currentDirection = UP;
+        }
+        else if (keystate[SDL_SCANCODE_S]) {
+            direction.y = 1;
+            currentDirection = DOWN;
+        }
 
-        if (keystate[SDL_SCANCODE_A]) direction.x = -1;
-        else if (keystate[SDL_SCANCODE_D]) direction.x = 1;
+        if (keystate[SDL_SCANCODE_A]) {
+            direction.x = -1;
+            currentDirection = LEFT;
+        } 
+        else if (keystate[SDL_SCANCODE_D]) {
+            direction.x = 1;
+            currentDirection = RIGHT;
+        } 
 
         acceleration.x = direction.x * playerSpeed;
         acceleration.y = direction.y * playerSpeed;
@@ -150,8 +166,23 @@ int main(){
         playerRect.x = position.x;
         playerRect.y = position.y;
 
-        player = playerDown[playerFrameIndex];
+        if (lastDirection == DOWN) currentFrames = playerDown;
+        else if (lastDirection == UP) currentFrames = playerUp;
+        else if (lastDirection == RIGHT) currentFrames = playerRight;
+        else if (lastDirection == LEFT) currentFrames = playerLeft;                        
 
+        if (currentDirection != lastDirection) playerFrameIndex = 0;
+
+        if (!(direction.x == 0 && direction.y == 0)) {
+            playerFrameIndex += animationSpeed * deltaTime;                        
+            lastDirection = currentDirection;
+            cout << "Frame Addition: " << animationSpeed * deltaTime << endl;
+            cout << "Frame count: " << playerFrameIndex << endl;
+            if (playerFrameIndex >= currentFrames.size()) playerFrameIndex = 0;
+            player = currentFrames[static_cast<int>(playerFrameIndex)];
+        }
+        else player = currentFrames[0];
+        
         SDL_SetRenderDrawColor(renderer,255,255,255,255);
         SDL_RenderClear(renderer);
 

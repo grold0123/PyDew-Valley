@@ -13,7 +13,8 @@ const char
 
 int 
 width,
-height;
+height,
+playerFrameIndex;
 
 float 
 offset_w,
@@ -41,10 +42,7 @@ playerLeft,
 playerRight;
 
 SDL_FRect 
-playerRect,
-playerBox,
-playerBox_2;
-
+playerRect;
 
 
 
@@ -77,11 +75,12 @@ int main(){
         playerUp.push_back(texture);
     }
 
-    player = IMG_LoadTexture(renderer,R"(C:\projects\PyDew-Valley\assets\graphics\character\down\0.png)");
+    playerFrameIndex = 0;
+
+    player = playerDown[playerFrameIndex];
     playerRect.x = playerRect.y = 0;
     SDL_GetTextureSize(player,&playerRect.w,&playerRect.h);
 
-    
     while (running) {
         
         while (SDL_PollEvent(&event)) {
@@ -89,13 +88,10 @@ int main(){
             if (event.type == SDL_EVENT_KEY_UP) cout << "Player Position: (" << playerRect.x << "," << playerRect.y << ")\n";
         }
         
+        player = playerDown[playerFrameIndex];
+
         SDL_SetRenderDrawColor(renderer,255,255,255,255);
         SDL_RenderClear(renderer);
-
-        SDL_SetRenderDrawColor(renderer,0,0,0,255);
-        SDL_RenderFillRect(renderer,&playerBox);
-        SDL_SetRenderDrawColor(renderer,255,255,255,255);
-        SDL_RenderFillRect(renderer,&playerBox_2);
 
          SDL_RenderTexture(renderer,player,NULL,&playerRect);
 
@@ -106,8 +102,3 @@ int main(){
     SDL_DestroyWindow(window);
     SDL_Quit();
 }
-
-vector2D::vector2D():
-    x(0),y(0){}
-vector2D::vector2D(float a,float b):
-    x(a),y(b){}
