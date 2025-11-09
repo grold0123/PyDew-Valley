@@ -14,7 +14,5 @@ for arg in args:
     result = subprocess.run(arg)
     if result.returncode == 0:
         continue
-    print('\nRepository not updated')
-    break
-
-print('\nRepository updated')
+    break;
+    
